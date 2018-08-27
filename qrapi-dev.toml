@@ -1,0 +1,19 @@
+[server]
+host = ""
+port = "3009"
+
+[log]
+log_dir = "./log"
+log_std = "true"
+
+[static]
+upload_dir = "./upload"
+
+[push]
+api_key = "AAAAyQ2ofN0:APA91bEz66dHhehSpnQDpjolBt9EeU9o2ZOi_Tc5Z7slUfQ_CXGH9Ww6sx4cC8bBUgZl01gTXmcW5Cfo84ymLQqfkNi_0NL233MCVFfEDUKkgXPYIXYwdM6mtUvo3aOdGaCGcLSOaEk5"
+
+[db]
+host = "mongodb://heroku_k80kpbms:7ia6io8esodnnsq8cqt6q0hf3v@ds153851.mlab.com:53851/heroku_k80kpbms"
+uname = "heroku_k80kpbms"
+password = "Trungyeulen4ever@123"
+name = "heroku_k80kpbms"
