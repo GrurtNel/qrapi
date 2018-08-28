@@ -23,11 +23,11 @@ func NewAuthServer(parent *gin.RouterGroup, name string) *AuthServer {
 
 func (s *AuthServer) login(c *gin.Context) {
 	var loginInfo = struct {
-		Uname    string
+		Phone    string
 		Password string
 	}{}
 	c.BindJSON(&loginInfo)
-	user, err := customer.Login(loginInfo.Uname, loginInfo.Password)
+	user, err := customer.Login(loginInfo.Phone, loginInfo.Password)
 	web.AssertNil(err)
 	var auth = auth.Create(user.ID, user.Role)
 	s.SendData(c, map[string]interface{}{

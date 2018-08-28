@@ -16,6 +16,11 @@ const (
 	ADMIN    = "admin"
 )
 
+var (
+	errExistEmail = "Xin lỗi! Email đã tồn tại trong hệ thống"
+	errExistPhone = "Xin lỗi! Số điện thoại đã tồn tại trong hệ thống"
+)
+
 type Customer struct {
 	mongodb.Model  `bson:",inline"`
 	Name           string   `bson:"name" json:"name"`
@@ -56,6 +61,14 @@ func (u *Customer) Create() error {
 	if err != nil {
 		customerLog.Error(err)
 		return web.WrapBadRequest(err, "")
+	}
+	var existEmail, _ = GetCustomerByEmail(u.Email)
+	if existEmail != nil {
+		return web.BadRequest(errExistEmail)
+	}
+	var existPhone, _ = GetCustomerByPhone(u.Phone)
+	if existPhone != nil {
+		return web.BadRequest(errExistPhone)
 	}
 	return customerTable.Create(u)
 }

@@ -30,5 +30,4 @@ func (s *GuestServer) register(c *gin.Context) {
 		"token":     auth.ID,
 		"user_info": u,
 	})
-	s.SendData(c, u)
 }

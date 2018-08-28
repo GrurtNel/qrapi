@@ -17,9 +17,9 @@ func GetUsers() ([]*Customer, error) {
 	return customer, err
 }
 
-func Login(uname, pwd string) (*Customer, error) {
+func Login(phone, pwd string) (*Customer, error) {
 	var customer *Customer
-	var query = bson.M{"uname": uname}
+	var query = bson.M{"phone": phone}
 	err := customerTable.FindOne(query, &customer)
 	if err != nil {
 		if err.Error() == "not found" {
