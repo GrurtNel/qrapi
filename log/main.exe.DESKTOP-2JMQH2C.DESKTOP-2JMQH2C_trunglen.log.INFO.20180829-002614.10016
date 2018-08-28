@@ -1,0 +1,5 @@
+Log file created at: 2018/08/29 00:26:14
+Running on machine: DESKTOP-2JMQH2C
+Binary: Built with gc go1.11 for windows/amd64
+Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+I0829 00:26:14.171536   10016 logger.go:22] [mongodb] connect to mongodb heroku_k80kpbms successfully on host mongodb://heroku_k80kpbms:7ia6io8esodnnsq8cqt6q0hf3v@ds153851.mlab.com:53851/heroku_k80kpbms
