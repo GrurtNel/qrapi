@@ -49,7 +49,7 @@ func (t *Table) FindAll(result interface{}) error {
 
 func (t *Table) FindWhere(query bson.M, result interface{}) error {
 	query["dtime"] = bson.M{"$ne": 0}
-	return t.Find(query).All(result)
+	return t.Find(query).Sort("$ctime:-1").All(result)
 }
 
 func (t *Table) FindID(id string, result interface{}) error {

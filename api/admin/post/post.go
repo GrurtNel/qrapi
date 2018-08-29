@@ -1,4 +1,4 @@
-package product
+package post
 
 import (
 	"context"
@@ -10,12 +10,12 @@ import (
 	// "qrapi/x/fcm"
 )
 
-type ProductServer struct {
+type PostServer struct {
 	*gin.RouterGroup
 	web.JsonRender
 }
 
-func NewProductServer(parent *gin.RouterGroup, name string) *PostServer {
+func NewPostServer(parent *gin.RouterGroup, name string) *PostServer {
 	var s = PostServer{
 		RouterGroup: parent.Group(name),
 	}

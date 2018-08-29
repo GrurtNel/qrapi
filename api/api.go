@@ -3,6 +3,7 @@ package api
 import (
 	"qrapi/api/admin"
 	"qrapi/api/auth"
+	"qrapi/api/customer"
 	"qrapi/api/guest"
 	"qrapi/api/public"
 
@@ -14,4 +15,5 @@ func NewApiServer(root *gin.RouterGroup) {
 	auth.NewAuthServer(root, "auth")
 	public.NewPublicServer(root, "public")
 	guest.NewGuestServer(root, "guest")
+	customer.NewCustomerServer(root, "customer")
 }

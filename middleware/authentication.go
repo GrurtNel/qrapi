@@ -30,6 +30,7 @@ func Authenticate(role string) gin.HandlerFunc {
 				return
 			}
 		}
+		c.Set("user_id", res.UserID)
 		c.Next()
 	}
 }
@@ -37,3 +38,4 @@ func Authenticate(role string) gin.HandlerFunc {
 var MustBeAdmin = Authenticate("admin")
 var MustBeBoss = Authenticate("boss")
 var MustBeManager = Authenticate("manager")
+var MustBeCustomer = Authenticate("customer")
