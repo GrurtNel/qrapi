@@ -5,6 +5,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang/glog"
 	"qrapi/g/x/web"
+	"qrapi/o/customer"
+	"qrapi/o/product"
 	"qrapi/x/fcm"
 	"qrapi/x/security"
 	"strings"
@@ -39,10 +41,15 @@ func (s *PublicServer) getProduct(c *gin.Context) {
 	var id = c.Query("id")
 	decrypted, err := security.Decrypt([]byte(CIPHER_KEY), id)
 	web.AssertNil(err)
+	customerID, productID := getCustomerProductID(decrypted)
 	glog.Info(decrypted)
+	customer, err := customer.GetCustomerByID(customerID)
+	web.AssertNil(err)
+	product, err := product.GetProductByID(productID)
+	web.AssertNil(err)
 	s.SendData(c, map[string]interface{}{
-		"product": "",
-		"ds":      "",
+		"product":  product,
+		"customer": customer,
 	})
 }
 

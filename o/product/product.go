@@ -33,3 +33,9 @@ func GetProductsByCustomer(customerID string) ([]*Product, error) {
 	var err = productTable.FindWhere(bson.M{"customer_id": customerID}, &products)
 	return products, err
 }
+
+func GetProductByID(id string) (*Product, error) {
+	var product *Product
+	var err = productTable.FindID(id, &product)
+	return product, err
+}

@@ -36,3 +36,9 @@ func Login(phone, pwd string) (*Customer, error) {
 	}
 	return customer, nil
 }
+
+func GetCustomerByID(id string) (*Customer, error) {
+	var customer *Customer
+	var err = customerTable.FindID(id, &customer)
+	return customer, err
+}
