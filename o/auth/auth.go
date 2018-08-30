@@ -1,8 +1,6 @@
 package auth
 
 import (
-	"gopkg.in/mgo.v2/bson"
-	"qrapi/g/x/math"
 	"qrapi/x/mongodb"
 )
 
@@ -16,17 +14,13 @@ type Auth struct {
 }
 
 func Create(userID, role string) *Auth {
-	var auth = Auth{
+	var auth = &Auth{
 		UserID:  userID,
 		Role:    role,
 		Revoked: false,
 	}
-	auth.SetID(math.RandString("auth", 80))
-	authTable.Upsert(bson.M{
-		"user_id": userID,
-		"role":    role,
-	}, auth)
-	return &auth
+	authTable.CreateAuth(auth)
+	return auth
 }
 
 func GetByID(id string) (*Auth, error) {
