@@ -13,7 +13,7 @@ var productTable = mongodb.NewTable("product", "prd")
 
 type Product struct {
 	mongodb.Model `bson:",inline"`
-	Title         string   `bson:"title" json:"title"`
+	Name          string   `bson:"name" json:"name"`
 	Gallery       []string `bson:"gallery" json:"gallery"`
 	Description   string   `bson:"description" json:"description"`
 	CustomerID    string   `bson:"customer_id" json:"customer_id"`

@@ -3,12 +3,11 @@ package public
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/golang/glog"
 	"qrapi/g/x/web"
-	"qrapi/o/category"
-	"qrapi/o/post"
-	"qrapi/o/push_token"
 	"qrapi/x/fcm"
-	"strconv"
+	"qrapi/x/security"
+	"strings"
 )
 
 type PublicServer struct {
@@ -20,15 +19,12 @@ func NewPublicServer(parent *gin.RouterGroup, name string) *PublicServer {
 	var s = PublicServer{
 		RouterGroup: parent.Group(name),
 	}
-	s.GET("post/list", s.getPosts)
-	s.GET("post/detail/:id", s.getDetail)
-	s.GET("category/list", s.getCategories)
-	s.GET("test", s.test)
-	s.POST("push_token/create", s.createPush)
+	s.GET("qrcode/scan", s.scanQrcode)
+	s.GET("product/detail", s.getProduct)
 	return &s
 }
 
-func (s *PublicServer) test(c *gin.Context) {
+func (s *PublicServer) scanQrcode(c *gin.Context) {
 	var token = c.Query("token")
 	var err, str = fcm.SendToOne(token, fcm.FmcMessage{Title: "Hello", Body: "Anh"})
 	fmt.Println(err)
@@ -36,31 +32,20 @@ func (s *PublicServer) test(c *gin.Context) {
 	s.Success(c)
 }
 
-func (s *PublicServer) getPosts(c *gin.Context) {
-	var cateID = c.Query("cat_id")
-	var page, _ = strconv.ParseInt(c.Query("page"), 10, 32)
-	var posts, err = post.GetAllPosts(cateID, page)
+const CIPHER_KEY = "trungyeulen4ever"
+
+//CTwHkYUk2AdRqEkLbfa6_rlK6_-x6h78ySbTNs1k4eDu9Zj1DtWlRg==
+func (s *PublicServer) getProduct(c *gin.Context) {
+	var id = c.Query("id")
+	decrypted, err := security.Decrypt([]byte(CIPHER_KEY), id)
 	web.AssertNil(err)
-	s.SendData(c, posts)
+	glog.Info(decrypted)
+	s.SendData(c, map[string]interface{}{
+		"product": "",
+		"ds":      "",
+	})
 }
 
-func (s *PublicServer) getCategories(c *gin.Context) {
-	var cats, err = category.GetCategories()
-	web.AssertNil(err)
-	c.JSON(200, cats)
-	// s.SendData(c, cats)
-}
-
-func (s *PublicServer) getDetail(c *gin.Context) {
-	var postID = c.Param("id")
-	var post, err = post.GetPost(postID)
-	web.AssertNil(err)
-	s.SendData(c, post)
-}
-
-func (s *PublicServer) createPush(c *gin.Context) {
-	var push *push_token.PushToken
-	c.BindJSON(&push)
-	web.AssertNil(push.Create())
-	s.Success(c)
+func getCustomerProductID(gid string) (string, string) {
+	return strings.Split(gid, "$$")[0], strings.Split(gid, "$$")[1]
 }
