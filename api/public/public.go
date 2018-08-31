@@ -1,9 +1,10 @@
 package public
 
 import (
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/golang/glog"
+	"qrapi/common"
 	"qrapi/g/x/web"
 	"qrapi/o/customer"
 	"qrapi/o/product"
@@ -34,19 +35,30 @@ func (s *PublicServer) scanQrcode(c *gin.Context) {
 	s.Success(c)
 }
 
-const CIPHER_KEY = "trungyeulen4ever"
-
 //CTwHkYUk2AdRqEkLbfa6_rlK6_-x6h78ySbTNs1k4eDu9Zj1DtWlRg==
+var errNotValidCode = errors.New("Không tìm thấy thông tin sản phẩm")
+
 func (s *PublicServer) getProduct(c *gin.Context) {
 	var id = c.Query("id")
-	decrypted, err := security.Decrypt([]byte(CIPHER_KEY), id)
-	web.AssertNil(err)
+	var code = c.Query("code")
+	if code != "" {
+		id = id + code
+	}
+	decrypted, err := security.Decrypt([]byte(common.CIPHER_KEY), id)
+	if err != nil {
+		web.AssertNil(errNotValidCode)
+	}
 	customerID, productID := getCustomerProductID(decrypted)
-	glog.Info(decrypted)
 	customer, err := customer.GetCustomerByID(customerID)
 	web.AssertNil(err)
+	if customer == nil {
+		web.AssertNil(errNotValidCode)
+	}
 	product, err := product.GetProductByID(productID)
 	web.AssertNil(err)
+	if product == nil {
+		web.AssertNil(errNotValidCode)
+	}
 	s.SendData(c, map[string]interface{}{
 		"product":  product,
 		"customer": customer,

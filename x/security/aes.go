@@ -11,7 +11,7 @@ import (
 
 const secretKey = "6368616e676520746869732070617373776f726420746f206120736563726574"
 
-func encrypt(key []byte, message string) (encmess string, err error) {
+func Encrypt(key []byte, message string) (encmess string, err error) {
 	plainText := []byte(message)
 
 	block, err := aes.NewCipher(key)
