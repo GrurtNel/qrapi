@@ -20,7 +20,6 @@ func NewAdminServer(parent *gin.RouterGroup, name string) *AdminServer {
 	var s = AdminServer{
 		RouterGroup: parent.Group(name),
 	}
-	// s.Use(middleware.MustBeAdmin)
 	s.GET("order/list", s.getOrders)
 	s.GET("order/generate", s.generateSV)
 	return &s
@@ -57,10 +56,8 @@ func (s *AdminServer) generateSV(c *gin.Context) {
 		}
 	}
 
-	wr.Flush() // writes the csv writer data to  the buffered data io writer(b(bytes.buffer))
-
+	wr.Flush()                                        // writes the csv writer data to  the buffered data io writer(b(bytes.buffer))
 	c.Writer.Header().Set("Content-Type", "text/csv") // setting the content type header to text/csv
-
 	c.Writer.Header().Set("Content-Type", "text/csv")
 	c.Writer.Header().Set("Content-Disposition", "attachment;filename=TheCSVFileName.csv")
 	c.Writer.Write(b.Bytes())
