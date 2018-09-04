@@ -23,7 +23,7 @@ func GetPort() string {
 func main() {
 	r := gin.New()
 	r.StaticFS("/app", http.Dir("./app")).Use(middleware.AddStaticHeader())
-	r.Use(middleware.AddHeader(), middleware.RecoveryWithWriter())
+	r.Use(gin.Logger(), middleware.AddHeader(), middleware.RecoveryWithWriter())
 	r.StaticFS("/static", http.Dir("./upload"))
 	api.NewApiServer(r.Group("api"))
 	// Listen and serve on 0.0.0.0:8080

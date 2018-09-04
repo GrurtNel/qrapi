@@ -27,3 +27,7 @@ func GetByID(id string) (*Auth, error) {
 	var auth *Auth
 	return auth, authTable.FindID(id, &auth)
 }
+
+func DeleteByID(id string) error {
+	return authTable.RemoveId(id)
+}

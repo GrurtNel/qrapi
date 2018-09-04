@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"qrapi/common"
 	"qrapi/g/x/web"
+	"qrapi/o/admin"
 	"qrapi/o/customer"
 	"qrapi/o/product"
 	"qrapi/x/fcm"
@@ -24,6 +25,7 @@ func NewPublicServer(parent *gin.RouterGroup, name string) *PublicServer {
 	}
 	s.GET("qrcode/scan", s.scanQrcode)
 	s.GET("product/detail", s.getProduct)
+	s.POST("register", s.register)
 	return &s
 }
 
@@ -32,6 +34,12 @@ func (s *PublicServer) scanQrcode(c *gin.Context) {
 	var err, str = fcm.SendToOne(token, fcm.FmcMessage{Title: "Hello", Body: "Anh"})
 	fmt.Println(err)
 	fmt.Println(str)
+	s.Success(c)
+}
+func (s *PublicServer) register(c *gin.Context) {
+	var admin *admin.Admin
+	web.AssertNil(c.BindJSON(&admin))
+	web.AssertNil(admin.CreateAccount())
 	s.Success(c)
 }
 

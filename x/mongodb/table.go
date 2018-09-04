@@ -44,7 +44,7 @@ func (t *Table) DeleteByID(id string) error {
 }
 
 func (t *Table) FindAll(result interface{}) error {
-	return t.Find(bson.M{"dtime": bson.M{"$ne": 0}}).All(result)
+	return t.Find(bson.M{"dtime": bson.M{"$ne": 0}}).Sort("$ctime:-1").All(result)
 }
 
 func (t *Table) FindWhere(query bson.M, result interface{}) error {

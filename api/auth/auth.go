@@ -17,6 +17,7 @@ func NewAuthServer(parent *gin.RouterGroup, name string) *AuthServer {
 		RouterGroup: parent.Group(name),
 	}
 	s.POST("login", s.login)
+	s.POST("logout", s.logout)
 	s.GET("super-admin", s.checkSuperAdmin)
 	return &s
 }
@@ -34,6 +35,12 @@ func (s *AuthServer) login(c *gin.Context) {
 		"token":     auth.ID,
 		"user_info": user,
 	})
+}
+
+func (s *AuthServer) logout(c *gin.Context) {
+	var token = web.GetToken(c.Request)
+	web.AssertNil(auth.DeleteByID(token))
+	s.Success(c)
 }
 
 func (s *AuthServer) checkSuperAdmin(c *gin.Context) {

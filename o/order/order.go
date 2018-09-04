@@ -38,6 +38,13 @@ func GetOrdersByCustomer(customerID string) ([]*Order, error) {
 	var err = orderTable.FindWhere(bson.M{"customer_id": customerID}, &orders)
 	return orders, err
 }
+
+func GetOrders() ([]*Order, error) {
+	var order []*Order
+	var err = orderTable.FindAll(&order)
+	return order, err
+}
+
 func GetOrderByID(id string) (*Order, error) {
 	var order *Order
 	var err = orderTable.FindID(id, &order)

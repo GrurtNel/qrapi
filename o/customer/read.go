@@ -42,3 +42,9 @@ func GetCustomerByID(id string) (*Customer, error) {
 	var err = customerTable.FindID(id, &customer)
 	return customer, err
 }
+
+func GetCustomers() ([]*Customer, error) {
+	var customer []*Customer
+	var err = customerTable.FindAll(&customer)
+	return customer, err
+}

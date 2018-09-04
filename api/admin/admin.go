@@ -6,6 +6,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"qrapi/common"
 	"qrapi/g/x/web"
+	"qrapi/middleware"
+	"qrapi/o/admin"
+	"qrapi/o/auth"
+	"qrapi/o/customer"
 	"qrapi/o/order"
 	"qrapi/x/security"
 	"strconv"
@@ -20,14 +24,39 @@ func NewAdminServer(parent *gin.RouterGroup, name string) *AdminServer {
 	var s = AdminServer{
 		RouterGroup: parent.Group(name),
 	}
+	s.Use(middleware.MustBeAdmin)
 	s.GET("order/list", s.getOrders)
+	s.GET("customer/list", s.getCustomers)
 	s.GET("order/generate", s.generateSV)
+	s.POST("auth/login", s.login)
 	return &s
 }
 
+func (s *AdminServer) login(c *gin.Context) {
+	var loginInfo = struct {
+		Phone    string
+		Password string
+	}{}
+	c.BindJSON(&loginInfo)
+	user, err := admin.Login(loginInfo.Phone, loginInfo.Password)
+	web.AssertNil(err)
+	var auth = auth.Create(user.ID, "admin")
+	s.SendData(c, map[string]interface{}{
+		"token":     auth.ID,
+		"user_info": user,
+	})
+}
+
 func (s *AdminServer) getOrders(c *gin.Context) {
-	var userID = c.Query("user_id")
-	s.SendData(c, userID)
+	var orders, err = order.GetOrders()
+	web.AssertNil(err)
+	s.SendData(c, orders)
+}
+
+func (s *AdminServer) getCustomers(c *gin.Context) {
+	var users, err = customer.GetCustomers()
+	web.AssertNil(err)
+	s.SendData(c, users)
 }
 
 func (s *AdminServer) generateSV(c *gin.Context) {
