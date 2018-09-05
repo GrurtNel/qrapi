@@ -8,9 +8,9 @@ import (
 )
 
 const (
-	PENDING_STATE     = "pending"
-	PROGRESSING_STATE = "progressing"
-	DONE_STATE        = "done"
+	PENDING_STATE  = "pending"
+	DELIVERY_STATE = "delivery"
+	DONE_STATE     = "done"
 )
 
 var orderLog = logger.NewLogger("tbl_order")
@@ -24,11 +24,11 @@ type Order struct {
 	ProductID     string `bson:"product_id" json:"product_id"`
 	Quantity      int    `bson:"quantity" json:"quantity"`
 	URL           string `bson:"url" json:"url"`
-	Status        string `bson:"status" json:"status"`
+	Activated     bool   `bson:"activated" json:"activated"`
 }
 
 func (order *Order) Create() error {
-	order.Status = PENDING_STATE
+	order.Activated = false
 	return orderTable.Create(order)
 }
 
@@ -43,6 +43,14 @@ func GetOrders() ([]*Order, error) {
 	var order []*Order
 	var err = orderTable.FindAll(&order)
 	return order, err
+}
+
+func DeliveryOrder(id string) error {
+	return orderTable.UpdateId(id, bson.M{
+		"$set": bson.M{
+			"activated": true,
+		},
+	})
 }
 
 func GetOrderByID(id string) (*Order, error) {

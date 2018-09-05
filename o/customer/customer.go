@@ -32,6 +32,7 @@ type Customer struct {
 	Logo           string   `bson:"logo" json:"logo"`
 	Information    string   `bson:"information" json:"information"`
 	Role           string   `bson:"role" json:"role"`
+	Activated      bool     `bson:"activated" json:"activated"`
 }
 
 const (

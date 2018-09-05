@@ -34,6 +34,9 @@ func Login(phone, pwd string) (*Customer, error) {
 		}
 		return nil, err
 	}
+	// if !customer.Activated {
+	// 	return nil, web.BadRequest("Tài khoản chưa được kích hoạt vui lòng liên hệ để được kích hoạt")
+	// }
 	return customer, nil
 }
 

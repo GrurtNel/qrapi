@@ -24,11 +24,12 @@ func NewAdminServer(parent *gin.RouterGroup, name string) *AdminServer {
 	var s = AdminServer{
 		RouterGroup: parent.Group(name),
 	}
+	s.POST("auth/login", s.login)
 	s.Use(middleware.MustBeAdmin)
 	s.GET("order/list", s.getOrders)
+	s.GET("order/delivery", s.deliveryOrder)
 	s.GET("customer/list", s.getCustomers)
 	s.GET("order/generate", s.generateSV)
-	s.POST("auth/login", s.login)
 	return &s
 }
 
@@ -51,6 +52,12 @@ func (s *AdminServer) getOrders(c *gin.Context) {
 	var orders, err = order.GetOrders()
 	web.AssertNil(err)
 	s.SendData(c, orders)
+}
+
+func (s *AdminServer) deliveryOrder(c *gin.Context) {
+	var orderID = c.Query("order_id")
+	web.AssertNil(order.DeliveryOrder(orderID))
+	s.Success(c)
 }
 
 func (s *AdminServer) getCustomers(c *gin.Context) {
