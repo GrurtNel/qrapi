@@ -36,5 +36,5 @@ func (scanHistory *ScanHistory) Create() error {
 		scanHistoryLog.Error(err)
 		return web.WrapBadRequest(err, "")
 	}
-	return scanHistoryTable.Create(scanHistory)
+	return scanHistoryTable.Insert(scanHistory)
 }
