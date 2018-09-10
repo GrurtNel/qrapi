@@ -34,8 +34,11 @@ func NewPublicServer(parent *gin.RouterGroup, name string) *PublicServer {
 }
 
 func (s *PublicServer) scanMarketing(c *gin.Context) {
+	var order, err = order.GetOrderByID(c.Query("order_id"))
+	web.AssertNil(err)
 	var scanHistory = &sHistory.ScanHistory{
-		OrderID: c.Query("order_id"),
+		OrderID: order.ID,
+		URL:     order.URL,
 	}
 	scanHistory.SetID(c.Query("order_id"))
 	web.AssertNil(scanHistory.Create())

@@ -16,18 +16,17 @@ type ScanHistory struct {
 	CustomerID    string `bson:"customer_id" json:"customer_id"`
 	ProductID     string `bson:"product_id" json:"product_id"`
 	OrderID       string `bson:"order_id" json:"order_id"`
-	NumberOfScan  string `bson:"number_of_scan" json:"number_of_scan"`
+	URL           string `bson:"url" json:"url"`
+	NumberOfScan  int    `bson:"number_of_scan" json:"number_of_scan"`
 }
 
 func (scanHistory *ScanHistory) Create() error {
 	var existScanHistory *ScanHistory
 	scanHistoryTable.FindId(scanHistory.ID).One(&existScanHistory)
 	if existScanHistory != nil {
-		scanHistoryTable.UpdateId(scanHistory.ID, bson.M{
-			"$set": bson.M{
-				"number_of_scan": bson.M{
-					"$inc": 1,
-				},
+		return scanHistoryTable.UpdateId(scanHistory.ID, bson.M{
+			"$inc": bson.M{
+				"number_of_scan": 1,
 			},
 		})
 	}
