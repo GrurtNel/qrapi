@@ -29,7 +29,7 @@ func NewAdminServer(parent *gin.RouterGroup, name string) *AdminServer {
 	s.GET("order/list", s.getOrders)
 	s.GET("order/delivery", s.deliveryOrder)
 	s.GET("customer/list", s.getCustomers)
-	s.GET("order/generate", s.generateSV)
+	s.GET("order/generate", s.generateCSV)
 	return &s
 }
 
@@ -66,10 +66,11 @@ func (s *AdminServer) getCustomers(c *gin.Context) {
 	s.SendData(c, users)
 }
 
-func (s *AdminServer) generateSV(c *gin.Context) {
+func (s *AdminServer) generateCSV(c *gin.Context) {
 	var numberOfCodes, _ = strconv.Atoi(c.Query("quantity"))
-	var orderID = c.Query("id")
+	var orderID = c.Query("order_id")
 	var order, err = order.GetOrderByID(orderID)
+	var endpointCheck = "http://localhost:4200/#/product/scan?type=qrcode-3&order_id=" + orderID + "&id="
 	web.AssertNil(err)
 	record := []string{"Link sản phẩm", "Mã thẻ cào"}
 	b := &bytes.Buffer{}
@@ -87,7 +88,7 @@ func (s *AdminServer) generateSV(c *gin.Context) {
 	} else {
 		for i := 0; i < numberOfCodes; i++ {
 			var encrypted, _ = security.Encrypt([]byte(common.CIPHER_KEY), order.CustomerID+"$$"+order.ProductID)
-			record = []string{encrypted[:len(encrypted)-6], encrypted[len(encrypted)-6 : len(encrypted)]}
+			record = []string{endpointCheck + encrypted[:len(encrypted)-6], encrypted[len(encrypted)-6 : len(encrypted)]}
 			wr.Write(record)
 		}
 	}
@@ -95,6 +96,6 @@ func (s *AdminServer) generateSV(c *gin.Context) {
 	wr.Flush()                                        // writes the csv writer data to  the buffered data io writer(b(bytes.buffer))
 	c.Writer.Header().Set("Content-Type", "text/csv") // setting the content type header to text/csv
 	c.Writer.Header().Set("Content-Type", "text/csv")
-	c.Writer.Header().Set("Content-Disposition", "attachment;filename=TheCSVFileName.csv")
+	c.Writer.Header().Set("Content-Disposition", "attachment;filename="+order.Name+".csv")
 	c.Writer.Write(b.Bytes())
 }

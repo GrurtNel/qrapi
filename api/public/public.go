@@ -27,7 +27,7 @@ func NewPublicServer(parent *gin.RouterGroup, name string) *PublicServer {
 	}
 	s.GET("qrcode/scan", s.scanQrcode)
 	s.GET("marketing/scan", s.scanMarketing)
-	s.GET("product/detail", s.getProduct)
+	s.GET("product/scan", s.scanProduct)
 	s.GET("order/detail", s.getOrder)
 	s.POST("register", s.register)
 	return &s
@@ -43,6 +43,45 @@ func (s *PublicServer) scanMarketing(c *gin.Context) {
 	scanHistory.SetID(c.Query("order_id"))
 	web.AssertNil(scanHistory.Create())
 	s.Success(c)
+}
+
+var errNotValidCode = errors.New("Không tìm thấy thông tin sản phẩm")
+
+func (s *PublicServer) scanProduct(c *gin.Context) {
+	var id = c.Query("id")
+	var code = c.Query("code")
+	if code != "" {
+		id = id + code
+	}
+	decrypted, err := security.Decrypt([]byte(common.CIPHER_KEY), id)
+	if err != nil {
+		web.AssertNil(errNotValidCode)
+	}
+	customerID, productID := getCustomerProductID(decrypted)
+	customer, err := customer.GetCustomerByID(customerID)
+	if err != nil {
+		web.AssertNil(errNotValidCode)
+	}
+	if customer == nil {
+		web.AssertNil(errNotValidCode)
+	}
+	product, err := product.GetProductByID(productID)
+	if err != nil || product == nil {
+		web.AssertNil(errNotValidCode)
+	}
+	//write scan history
+	order, err := order.GetOrderByID(c.Query("order_id"))
+	web.AssertNil(err)
+	var scanHistory = &sHistory.ScanHistory{
+		OrderID:   order.ID,
+		ProductID: productID,
+	}
+	scanHistory.SetID(c.Query("order_id"))
+	web.AssertNil(scanHistory.Create())
+	s.SendData(c, map[string]interface{}{
+		"product":  product,
+		"customer": customer,
+	})
 }
 
 func (s *PublicServer) scanQrcode(c *gin.Context) {
@@ -67,34 +106,6 @@ func (s *PublicServer) getOrder(c *gin.Context) {
 }
 
 //CTwHkYUk2AdRqEkLbfa6_rlK6_-x6h78ySbTNs1k4eDu9Zj1DtWlRg==
-var errNotValidCode = errors.New("Không tìm thấy thông tin sản phẩm")
-
-func (s *PublicServer) getProduct(c *gin.Context) {
-	var id = c.Query("id")
-	var code = c.Query("code")
-	if code != "" {
-		id = id + code
-	}
-	decrypted, err := security.Decrypt([]byte(common.CIPHER_KEY), id)
-	if err != nil {
-		web.AssertNil(errNotValidCode)
-	}
-	customerID, productID := getCustomerProductID(decrypted)
-	customer, err := customer.GetCustomerByID(customerID)
-	web.AssertNil(err)
-	if customer == nil {
-		web.AssertNil(errNotValidCode)
-	}
-	product, err := product.GetProductByID(productID)
-	web.AssertNil(err)
-	if product == nil {
-		web.AssertNil(errNotValidCode)
-	}
-	s.SendData(c, map[string]interface{}{
-		"product":  product,
-		"customer": customer,
-	})
-}
 
 func getCustomerProductID(gid string) (string, string) {
 	return strings.Split(gid, "$$")[0], strings.Split(gid, "$$")[1]
