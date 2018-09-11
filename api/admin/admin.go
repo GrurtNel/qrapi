@@ -67,7 +67,7 @@ func (s *AdminServer) getCustomers(c *gin.Context) {
 }
 
 func (s *AdminServer) generateCSV(c *gin.Context) {
-	var numberOfCodes, _ = strconv.Atoi(c.Query("quantity"))
+	var quantity, _ = strconv.Atoi(c.Query("quantity"))
 	var orderID = c.Query("order_id")
 	var order, err = order.GetOrderByID(orderID)
 	var endpointCheck = "http://localhost:4200/#/product/scan?type=qrcode-3&order_id=" + orderID + "&id="
@@ -76,17 +76,17 @@ func (s *AdminServer) generateCSV(c *gin.Context) {
 	b := &bytes.Buffer{}
 	wr := csv.NewWriter(b)
 	if order.Type == common.QRCOODE_MARKETING {
-		for i := 0; i < numberOfCodes; i++ {
+		for i := 0; i < quantity; i++ {
 			record = []string{order.URL, ""}
 			wr.Write(record)
 		}
 	} else if order.Type == common.QRCOODE_TYPE1 {
-		for i := 0; i < numberOfCodes; i++ {
+		for i := 0; i < quantity; i++ {
 			record = []string{order.URL, ""}
 			wr.Write(record)
 		}
 	} else {
-		for i := 0; i < numberOfCodes; i++ {
+		for i := 0; i < quantity; i++ {
 			var encrypted, _ = security.Encrypt([]byte(common.CIPHER_KEY), order.CustomerID+"$$"+order.ProductID)
 			record = []string{endpointCheck + encrypted[:len(encrypted)-6], encrypted[len(encrypted)-6 : len(encrypted)]}
 			wr.Write(record)
